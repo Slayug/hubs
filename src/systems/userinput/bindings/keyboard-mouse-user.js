@@ -2,6 +2,7 @@ import { paths } from "../paths";
 import { sets } from "../sets";
 import { xforms } from "./xforms";
 import { addSetsToBindings } from "./utils";
+import { KEYCODE_TO_CODE, ACTION_TO_CODE } from "../devices/keyboard";
 
 // import { Pose } from "../pose";
 
@@ -45,20 +46,20 @@ export const keyboardMouseUserBindings = addSetsToBindings({
     },
     {
       src: {
-        w: paths.device.keyboard.key("arrowup"),
-        a: paths.device.keyboard.key("arrowleft"),
-        s: paths.device.keyboard.key("arrowdown"),
-        d: paths.device.keyboard.key("arrowright")
+        w: paths.device.keyboard.key(ACTION_TO_CODE.FORWARD_ARROW),
+        a: paths.device.keyboard.key(ACTION_TO_CODE.LEFT_ARROW),
+        s: paths.device.keyboard.key(ACTION_TO_CODE.BACKWARD_ARROW),
+        d: paths.device.keyboard.key(ACTION_TO_CODE.RIGHT_ARROW)
       },
       dest: { vec2: arrows_vec2 },
       xform: xforms.wasd_to_vec2
     },
     {
       src: {
-        w: paths.device.keyboard.key("w"),
-        a: paths.device.keyboard.key("a"),
-        s: paths.device.keyboard.key("s"),
-        d: paths.device.keyboard.key("d")
+        w: paths.device.keyboard.key(ACTION_TO_CODE.FORWARD),
+        a: paths.device.keyboard.key(ACTION_TO_CODE.LEFT),
+        s: paths.device.keyboard.key(ACTION_TO_CODE.BACKWARD),
+        d: paths.device.keyboard.key(ACTION_TO_CODE.RIGHT)
       },
       dest: { vec2: wasd_vec2 },
       xform: xforms.wasd_to_vec2
@@ -93,12 +94,12 @@ export const keyboardMouseUserBindings = addSetsToBindings({
       xform: xforms.falling
     },
     {
-      src: { value: paths.device.keyboard.key("q") },
+      src: { value: paths.device.keyboard.key(ACTION_TO_CODE.TURN_LEFT) },
       dest: { value: paths.actions.snapRotateLeft },
       xform: xforms.rising
     },
     {
-      src: { value: paths.device.keyboard.key("g") },
+      src: { value: paths.device.keyboard.key(ACTION_TO_CODE.FLY) },
       dest: { value: paths.actions.toggleFly },
       xform: xforms.rising
     },
@@ -108,7 +109,7 @@ export const keyboardMouseUserBindings = addSetsToBindings({
       xform: xforms.rising
     },
     {
-      src: { value: paths.device.keyboard.key("e") },
+      src: { value: paths.device.keyboard.key(ACTION_TO_CODE.TURN_RIGHT) },
       dest: { value: paths.actions.snapRotateRight },
       xform: xforms.rising
     },
@@ -212,7 +213,7 @@ export const keyboardMouseUserBindings = addSetsToBindings({
     },
     {
       src: {
-        value: paths.device.keyboard.key("t")
+        value: paths.device.keyboard.key(ACTION_TO_CODE.FOCUS_CHAT)
       },
       dest: {
         value: paths.actions.focusChat

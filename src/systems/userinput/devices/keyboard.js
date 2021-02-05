@@ -1,9 +1,35 @@
 import { paths } from "../paths";
 import { ArrayBackedSet } from "../array-backed-set";
+
+export const ACTION_TO_CODE = {
+  FLY: "KeyG",
+  FORWARD: "KeyW",
+  FORWARD_ARROW: "ArrowUp",
+  BACKWARD: "KeyS",
+  BACKWARD_ARROW: "ArrowDown",
+  LEFT: "KeyA",
+  LEFT_ARROW: "ArrowLeft",
+  RIGHT: "KeyD",
+  RIGHT_ARROW: "ArrowRight",
+  TURN_LEFT: "KeyQ",
+  TURN_RIGHT: "KeyG",
+  FOCUS_CHAT: "KeyT"
+};
+
+export const KEYCODE_TO_CODE = {
+  65: "KeyQ",
+  68: "KeyD",
+  71: "KeyG",
+  81: "KeyA",
+  84: "KeyT",
+  83: "KeyS",
+  90: "KeyW"
+};
+
 export class KeyboardDevice {
   constructor() {
     this.seenKeys = new ArrayBackedSet();
-    this.keys = {};
+    this.codes = {};
     this.events = [];
 
     ["keydown", "keyup"].map(x =>
@@ -42,21 +68,38 @@ export class KeyboardDevice {
     for (let i = 0; i < this.events.length; i++) {
       const event = this.events[i];
       if (event.type === "blur") {
-        this.keys = {};
+        this.codes = {};
         this.seenKeys.clear();
       } else {
-        const key = event.key.toLowerCase();
-        this.keys[key] = event.type === "keydown";
-        this.seenKeys.add(key);
+        // Support new and old browsers
+        // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code#browser_compatibility
+        // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#browser_compatibility
+        // Thanks to https://github.com/mozilla/hubs/issues/2397#issuecomment-750301258
+        let code = event.code ?? KEYCODE_TO_CODE[event.keyCode];
+
+        /**
+         * Special key always handle old way
+         * To handle both keys, for instance "ShiftLeft" and "ShiftRight", same for alt.
+         */
+        if (event.key === "Shift" || event.key === "Alt" || event.key === "Control") {
+          code = event.key.toLowerCase();
+        }
+        // const key = event.key.toLowerCase();
+        // console.log(event);
+        // console.log("code", code);
+        // console.log("fromKeyCode", KEYCODE_TO_CODE[90]);
+        console.log(code);
+        this.codes[code] = event.type === "keydown";
+        this.seenKeys.add(code);
       }
     }
 
     this.events.length = 0;
 
     for (let i = 0; i < this.seenKeys.items.length; i++) {
-      const key = this.seenKeys.items[i];
-      const path = paths.device.keyboard.key(key);
-      frame.setValueType(path, this.keys[key]);
+      const code = this.seenKeys.items[i];
+      const path = paths.device.keyboard.key(code);
+      frame.setValueType(path, this.codes[code]);
     }
   }
 }
