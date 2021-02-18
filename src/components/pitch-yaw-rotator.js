@@ -1,4 +1,5 @@
 import { paths } from "../systems/userinput/paths";
+import { CAMERA_MODE_THIRD_PERSON_SKY } from "../systems/camera-system";
 
 const rotatePitchAndYaw = (function() {
   const opq = new THREE.Quaternion();
@@ -11,19 +12,32 @@ const rotatePitchAndYaw = (function() {
   const v = new THREE.Vector3();
   const UP = new THREE.Vector3(0, 1, 0);
 
-  return function rotatePitchAndYaw(o, p, y) {
-    o.parent.updateMatrices();
-    o.updateMatrices();
-    o.parent.getWorldQuaternion(opq);
-    o.getWorldQuaternion(owq);
-    oq.copy(o.quaternion);
+  return function rotatePitchAndYaw(object3D, xRotation, cameraDelta) {
+    object3D.parent.updateMatrices();
+    object3D.updateMatrices();
+    console.log(object3D);
+
+    //Returns the quaternion representing the rotation of *avatar-rig* in world space.
+    object3D.parent.getWorldQuaternion(opq);
+    //Returns the quaternion representing the rotation of *avatar-pov-node* in world space.
+    object3D.getWorldQuaternion(owq);
+
+    oq.copy(object3D.quaternion);
     v.set(0, 1, 0).applyQuaternion(oq);
+    console.log("must contains only the Y quaternion", oq);
+
     const initialUpDot = v.dot(UP);
     v.set(0, 0, 1).applyQuaternion(oq);
+
     const initialForwardDotUp = Math.abs(v.dot(UP));
     right.set(1, 0, 0).applyQuaternion(owq);
-    pq.setFromAxisAngle(right, p);
-    yq.setFromAxisAngle(UP, y);
+    pq.setFromAxisAngle(right, xRotation);
+    yq.setFromAxisAngle(UP, cameraDelta);
+
+    const cameraMode = AFRAME.scenes[0].systems["hubs-systems"].cameraSystem.mode;
+    if (cameraMode == CAMERA_MODE_THIRD_PERSON_SKY) {
+      return;
+    }
 
     q.copy(owq)
       .premultiply(pq)
@@ -37,11 +51,10 @@ const rotatePitchAndYaw = (function() {
     if ((newForwardDotUp > 0.9 && newForwardDotUp > initialForwardDotUp) || (newUpDot < 0 && newUpDot < initialUpDot)) {
       // TODO: Apply a partial rotation that does not exceed the bounds for nicer UX
       return;
-    } else {
-      o.quaternion.copy(q);
-      o.matrixNeedsUpdate = true;
-      o.updateMatrices();
     }
+    object3D.quaternion.copy(q);
+    object3D.matrixNeedsUpdate = true;
+    object3D.updateMatrices();
   };
 })();
 

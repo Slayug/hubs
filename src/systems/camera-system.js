@@ -150,11 +150,13 @@ export const CAMERA_MODE_THIRD_PERSON_NEAR = 1;
 export const CAMERA_MODE_THIRD_PERSON_FAR = 2;
 export const CAMERA_MODE_INSPECT = 3;
 export const CAMERA_MODE_SCENE_PREVIEW = 4;
+export const CAMERA_MODE_THIRD_PERSON_SKY = 5;
 
 const NEXT_MODES = {
   [CAMERA_MODE_FIRST_PERSON]: CAMERA_MODE_THIRD_PERSON_NEAR,
   [CAMERA_MODE_THIRD_PERSON_NEAR]: CAMERA_MODE_THIRD_PERSON_FAR,
-  [CAMERA_MODE_THIRD_PERSON_FAR]: CAMERA_MODE_FIRST_PERSON
+  [CAMERA_MODE_THIRD_PERSON_FAR]: CAMERA_MODE_THIRD_PERSON_SKY,
+  [CAMERA_MODE_THIRD_PERSON_SKY]: CAMERA_MODE_FIRST_PERSON
 };
 
 const CAMERA_LAYER_INSPECT = 4;
@@ -246,10 +248,10 @@ export class CameraSystem {
       return;
     }
 
-    if (!enableThirdPersonMode) return;
     if (this.mode === CAMERA_MODE_SCENE_PREVIEW) return;
 
     this.mode = NEXT_MODES[this.mode] || 0;
+    console.log("currentMode", this.mode);
   }
 
   inspect(el, distanceMod, fireChangeEvent = true) {
@@ -473,16 +475,35 @@ export class CameraSystem {
           this.avatarPOV.object3D.updateMatrices();
           setMatrixWorld(this.viewingCamera.object3DMap.camera, this.avatarPOV.object3D.matrixWorld);
         }
-      } else if (this.mode === CAMERA_MODE_THIRD_PERSON_NEAR || this.mode === CAMERA_MODE_THIRD_PERSON_FAR) {
+      } else if (
+        this.mode === CAMERA_MODE_THIRD_PERSON_NEAR ||
+        this.mode === CAMERA_MODE_THIRD_PERSON_FAR ||
+        this.mode === CAMERA_MODE_THIRD_PERSON_SKY
+      ) {
         if (this.mode === CAMERA_MODE_THIRD_PERSON_NEAR) {
           translation.makeTranslation(0, 1, 3);
-        } else {
+        } else if (this.mode === CAMERA_MODE_THIRD_PERSON_FAR) {
           translation.makeTranslation(0, 2, 8);
+        } else if (this.mode === CAMERA_MODE_THIRD_PERSON_SKY) {
+          translation.makeTranslation(0, 3.5, 1.6);
         }
+
         this.avatarRig.object3D.updateMatrices();
+
+        // translation of viewingRig from avatarRig
         this.viewingRig.object3D.matrixWorld.copy(this.avatarRig.object3D.matrixWorld).multiply(translation);
+
         setMatrixWorld(this.viewingRig.object3D, this.viewingRig.object3D.matrixWorld);
-        this.avatarPOV.object3D.quaternion.copy(this.viewingCamera.object3DMap.camera.quaternion);
+
+        if (this.mode === CAMERA_MODE_THIRD_PERSON_SKY) {
+          const quaternion = new THREE.Quaternion();
+          this.viewingCamera.object3D.quaternion.copy(
+            quaternion.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI / 2)
+          );
+        } else {
+          this.avatarPOV.object3D.quaternion.copy(this.viewingCamera.object3DMap.camera.quaternion);
+        }
+
         this.avatarPOV.object3D.matrixNeedsUpdate = true;
       } else if (this.mode === CAMERA_MODE_INSPECT) {
         this.avatarPOVRotator.on = false;
