@@ -29,6 +29,23 @@ export function getObjectUrl(object) {
   return null;
 }
 
+import { TOGGLE_HIDE_ROOM_LAYOUT_EVENT } from "./RoomLayoutContainer";
+
+export function useGrowObject(hubChannel, scene, object) {
+  const [isGrowed, setIsGrowed] = useState(false);
+
+  const toggleGrow = useCallback(
+    () => {
+      scene.emit(TOGGLE_HIDE_ROOM_LAYOUT_EVENT, {});
+
+      setIsGrowed(!isGrowed);
+    },
+    [object]
+  );
+
+  return { toggleGrow };
+}
+
 export function usePinObject(hubChannel, scene, object) {
   const [isPinned, setIsPinned] = useState(getPinnedState(object.el));
 

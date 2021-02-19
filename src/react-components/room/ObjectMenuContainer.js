@@ -9,9 +9,11 @@ import {
   getObjectUrl,
   isPlayer,
   isMe,
-  useHideAvatar
+  useHideAvatar,
+  useGrowObject
 } from "./object-hooks";
 import { ReactComponent as PinIcon } from "../icons/Pin.svg";
+import { ReactComponent as GrowIcon } from "../icons/Grow.svg";
 import { ReactComponent as LinkIcon } from "../icons/Link.svg";
 import { ReactComponent as GoToIcon } from "../icons/GoTo.svg";
 import { ReactComponent as DeleteIcon } from "../icons/Delete.svg";
@@ -59,6 +61,7 @@ PlayerMenuItems.propTypes = {
 };
 
 function ObjectMenuItems({ hubChannel, scene, activeObject, deselectObject, onGoToObject }) {
+  const { toggleGrow } = useGrowObject(hubChannel, scene, activeObject);
   const { canPin, isPinned, togglePinned } = usePinObject(hubChannel, scene, activeObject);
   const { canRemoveObject, removeObject } = useRemoveObject(hubChannel, scene, activeObject);
   const { canGoTo, goToSelectedObject } = useGoToSelectedObject(scene, activeObject);
@@ -66,6 +69,9 @@ function ObjectMenuItems({ hubChannel, scene, activeObject, deselectObject, onGo
 
   return (
     <>
+      <ObjectMenuButton onClick={toggleGrow}>
+        <GrowIcon />
+      </ObjectMenuButton>
       <ObjectMenuButton disabled={!canPin} onClick={togglePinned}>
         <PinIcon />
         <span>

@@ -18,20 +18,22 @@ export function RoomLayout({
   objectFocused,
   streaming,
   viewportRef,
+  hideToolbar,
   ...rest
 }) {
   return (
     <div className={classNames(styles.roomLayout, { [styles.objectFocused]: objectFocused }, className)} {...rest}>
       {sidebar && <div className={classNames(styles.sidebar, sidebarClassName)}>{sidebar}</div>}
       <div className={classNames(styles.modalContainer, styles.viewport)}>{modal}</div>
-      {(toolbarLeft || toolbarCenter || toolbarRight) && (
-        <Toolbar
-          className={classNames(styles.main, styles.toolbar, toolbarClassName)}
-          left={toolbarLeft}
-          center={toolbarCenter}
-          right={toolbarRight}
-        />
-      )}
+      {(toolbarLeft || toolbarCenter || toolbarRight) &&
+        (!hideToolbar && (
+          <Toolbar
+            className={classNames(styles.main, styles.toolbar, toolbarClassName)}
+            left={toolbarLeft}
+            center={toolbarCenter}
+            right={toolbarRight}
+          />
+        ))}
       <div
         className={classNames(styles.main, styles.viewport, { [styles.streaming]: streaming }, viewportClassName)}
         ref={viewportRef}
@@ -55,5 +57,10 @@ RoomLayout.propTypes = {
   viewport: PropTypes.node,
   objectFocused: PropTypes.bool,
   streaming: PropTypes.bool,
-  viewportRef: PropTypes.any
+  viewportRef: PropTypes.any,
+  hideToolbar: PropTypes.bool
+};
+
+RoomLayout.defaultProps = {
+  hideToolbar: false
 };
