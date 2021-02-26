@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Modal } from "../modal/Modal";
-import { Button } from "../input/Button";
+import { Button, AcceptButton } from "../input/Button";
 import { ReactComponent as MicrophoneIcon } from "../icons/Microphone.svg";
 import { ReactComponent as MicrophoneMutedIcon } from "../icons/MicrophoneMuted.svg";
 import { ReactComponent as VolumeHighIcon } from "../icons/VolumeHigh.svg";
@@ -29,10 +29,11 @@ export function MicSetupModal({
   onPlaySound,
   microphoneMuted,
   onChangeMicrophoneMuted,
-  onEnterRoom,
+  finished,
   onBack,
   ...rest
 }) {
+  console.log("MIC OPTIONS ", microphoneOptions);
   return (
     <Modal
       title={<FormattedMessage id="mic-setup-modal.title" defaultMessage="Microphone Setup" />}
@@ -125,9 +126,7 @@ export function MicSetupModal({
             />
           </>
         )}
-        <Button preset="green" onClick={onEnterRoom}>
-          <FormattedMessage id="mic-setup-modal.enter-room-button" defaultMessage="Enter Room" />
-        </Button>
+        <AcceptButton preset="accept" onClick={finished} />
       </Column>
     </Modal>
   );
@@ -145,7 +144,7 @@ MicSetupModal.propTypes = {
   microphoneOptions: PropTypes.array,
   onChangeMicrophone: PropTypes.func,
   onPromptMicrophone: PropTypes.func,
-  onEnterRoom: PropTypes.func,
+  finished: PropTypes.func,
   onBack: PropTypes.func
 };
 

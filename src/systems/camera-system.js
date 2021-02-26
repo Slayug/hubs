@@ -251,7 +251,6 @@ export class CameraSystem {
     if (this.mode === CAMERA_MODE_SCENE_PREVIEW) return;
 
     this.mode = NEXT_MODES[this.mode] || 0;
-    console.log("currentMode", this.mode);
   }
 
   inspect(el, distanceMod, fireChangeEvent = true) {

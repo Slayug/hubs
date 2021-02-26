@@ -36,6 +36,8 @@ AFRAME.registerSystem("hubs-systems", {
     waitForDOMContentLoaded().then(() => {
       this.DOMContentDidLoad = true;
     });
+
+    console.log("init hubs systems");
     this.cursorTogglingSystem = new CursorTogglingSystem();
     this.interactionSfxSystem = new InteractionSfxSystem();
     this.superSpawnerSystem = new SuperSpawnerSystem();
