@@ -15,7 +15,6 @@ const rotatePitchAndYaw = (function() {
   return function rotatePitchAndYaw(object3D, xRotation, cameraDelta) {
     object3D.parent.updateMatrices();
     object3D.updateMatrices();
-    console.log(object3D);
 
     //Returns the quaternion representing the rotation of *avatar-rig* in world space.
     object3D.parent.getWorldQuaternion(opq);
@@ -24,7 +23,6 @@ const rotatePitchAndYaw = (function() {
 
     oq.copy(object3D.quaternion);
     v.set(0, 1, 0).applyQuaternion(oq);
-    console.log("must contains only the Y quaternion", oq);
 
     const initialUpDot = v.dot(UP);
     v.set(0, 0, 1).applyQuaternion(oq);

@@ -7,6 +7,12 @@ import { AvatarSettingsSidebar } from "./room/AvatarSettingsSidebar";
 import { AvatarSetupModal } from "./room/AvatarSetupModal";
 import AvatarPreview from "./avatar-preview";
 
+import {
+  CAMERA_MODE_FIRST_PERSON,
+  CAMERA_MODE_THIRD_PERSON_NEAR,
+  CAMERA_MODE_THIRD_PERSON_SKY
+} from "../systems/camera-system";
+
 export default class ProfileEntryPanel extends Component {
   static propTypes = {
     containerType: PropTypes.oneOf(["sidebar", "modal"]),
@@ -26,6 +32,12 @@ export default class ProfileEntryPanel extends Component {
     containerType: "modal"
   };
 
+  static cameraOptions = [
+    { label: "Première personne", value: CAMERA_MODE_FIRST_PERSON },
+    { label: "Troisième personne", value: CAMERA_MODE_THIRD_PERSON_NEAR },
+    { label: "Vue de dessus", value: CAMERA_MODE_THIRD_PERSON_SKY }
+  ];
+
   state = {
     avatarId: null,
     displayName: null,
@@ -40,11 +52,12 @@ export default class ProfileEntryPanel extends Component {
     }
     this.props.store.addEventListener("statechanged", this.storeUpdated);
     this.scene = document.querySelector("a-scene");
+    console.log("state", this.state);
   }
 
   getStateFromProfile = () => {
     const { displayName, avatarId } = this.props.store.state.profile;
-    return { displayName, avatarId };
+    return { displayName, avatarId, currentCamera: ProfileEntryPanel.cameraOptions[2] };
   };
 
   storeUpdated = () => this.setState(this.getStateFromProfile());
@@ -135,7 +148,15 @@ export default class ProfileEntryPanel extends Component {
       },
       onSubmit: this.saveStateAndFinish,
       onClose: this.props.onClose,
-      onBack: this.props.onBack
+      onBack: this.props.onBack,
+      onChangeCamera: camera => {
+        const cameraSystem = AFRAME.scenes[0].systems["hubs-systems"].cameraSystem;
+        cameraSystem.cameraOnEnteredScene = camera;
+
+        this.setState({ currentCamera: ProfileEntryPanel.cameraOptions.find(option => option.value === camera) });
+      },
+      cameraOptions: ProfileEntryPanel.cameraOptions,
+      currentCamera: this.state.currentCamera
     };
 
     if (this.props.containerType === "sidebar") {

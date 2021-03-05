@@ -6,6 +6,8 @@ import { TextInputField } from "../input/TextInputField";
 import { Column } from "../layout/Column";
 import { FormattedMessage } from "react-intl";
 
+import { SelectInputField } from "../input/SelectInputField";
+
 export function AvatarSettingsContent({
   displayName,
   displayNameInputRef,
@@ -14,6 +16,9 @@ export function AvatarSettingsContent({
   avatarPreview,
   displayNamePattern,
   onChangeAvatar,
+  onChangeCamera,
+  cameraOptions,
+  currentCamera,
   ...rest
 }) {
   return (
@@ -40,6 +45,7 @@ export function AvatarSettingsContent({
           <FormattedMessage id="avatar-settings-content.change-avatar-button" defaultMessage="Change Avatar" />
         </Button>
       </div>
+      <SelectInputField label="Camera" value={currentCamera} options={cameraOptions} onChange={onChangeCamera} />
       <AcceptButton preset="accept" type="submit" />
     </Column>
   );
@@ -53,5 +59,8 @@ AvatarSettingsContent.propTypes = {
   displayNamePattern: PropTypes.string,
   onChangeDisplayName: PropTypes.func,
   avatarPreview: PropTypes.node,
-  onChangeAvatar: PropTypes.func
+  onChangeAvatar: PropTypes.func,
+  onChangeCamera: PropTypes.func,
+  currentCamera: PropTypes.object,
+  cameraOptions: PropTypes.array
 };

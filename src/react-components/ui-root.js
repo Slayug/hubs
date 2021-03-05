@@ -91,7 +91,6 @@ import { UserProfileSidebarContainer } from "./room/UserProfileSidebarContainer"
 import { CloseRoomModal } from "./room/CloseRoomModal";
 import { WebVRUnsupportedModal } from "./room/WebVRUnsupportedModal";
 import { TweetModalContainer } from "./room/TweetModalContainer";
-import { CameraSetupModal } from "./room/CameraSetupModal";
 import { TipContainer, FullscreenTip } from "./room/TipContainer";
 import { SpectatingLabel } from "./room/SpectatingLabel";
 import { SignInMessages } from "./auth/SignInModal";
@@ -878,21 +877,8 @@ class UIRoot extends Component {
         microphoneEnabled={!!this.mediaDevicesManager.audioTrack}
         microphoneMuted={muteOnEntry}
         onChangeMicrophoneMuted={() => this.props.store.update({ preferences: { muteMicOnEntry: !muteOnEntry } })}
-        finished={}
-        onBack={() => this.props.history.goBack()}
-      />
-    );
-  };
-
-  renderCameraSetupPanel = () => {
-    return (
-      <CameraSetupModal
-        onChangeCamera={camera => {
-          console.log("camera s ", camera);
-        }}
-        onBack={() => this.props.history.goBack()}
         onEnterRoom={this.onAudioReadyButton}
-        scene={this.props.scene}
+        onBack={() => this.props.history.goBack()}
       />
     );
   };
@@ -1039,9 +1025,6 @@ class UIRoot extends Component {
           </StateRoute>
           <StateRoute stateKey="entry_step" stateValue="audio" history={this.props.history}>
             {this.renderAudioSetupPanel()}
-          </StateRoute>
-          <StateRoute stateKey="entry_step" stateValue="camera" history={this.props.history}>
-            {this.renderCameraSetupPanel()}
           </StateRoute>
           <StateRoute
             stateKey="entry_step"
