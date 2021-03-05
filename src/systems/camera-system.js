@@ -199,17 +199,23 @@ function getAudio(o) {
   return audio;
 }
 
+const CAMERA_MIN_ZOOM = 1;
+const CAMERA_MAX_ZOOM = 10;
+
 const FALLOFF = 0.9;
 export class CameraSystem {
   constructor(scene) {
     this.lightsEnabled = false;
     this.verticalDelta = 0;
     this.horizontalDelta = 0;
-    this.inspectZoom = 0;
     this.mode = CAMERA_MODE_SCENE_PREVIEW;
     this.cameraOnEnteredScene = CAMERA_MODE_THIRD_PERSON_SKY;
     this.snapshot = { audioTransform: new THREE.Matrix4(), matrixWorld: new THREE.Matrix4() };
     this.audioSourceTargetTransform = new THREE.Matrix4();
+
+    this.cameraZoom = 0;
+    this.inspectZoom = 0;
+
     waitForDOMContentLoaded().then(() => {
       this.avatarPOV = document.getElementById("avatar-pov-node");
       this.avatarRig = document.getElementById("avatar-rig");
@@ -453,8 +459,16 @@ export class CameraSystem {
       if (this.userinput.get(paths.actions.nextCameraMode)) {
         this.nextMode();
       }
-      if (this.userinput.get(paths.device.mouse.wheel)) {
-        console.log("wheel", this.userinput.get(paths.device.mouse.wheel));
+
+      if (this.userinput.get(paths.actions.cameraZoomOut)) {
+        if (this.cameraZoom < CAMERA_MAX_ZOOM) {
+          this.cameraZoom += 0.02;
+        }
+      }
+      if (this.userinput.get(paths.actions.cameraZoomIn)) {
+        if (this.cameraZoom > CAMERA_MIN_ZOOM) {
+          this.cameraZoom -= 0.02;
+        }
       }
 
       const headShouldBeVisible = this.mode !== CAMERA_MODE_FIRST_PERSON;
@@ -487,6 +501,8 @@ export class CameraSystem {
           translation.makeTranslation(0, 1, 3);
         } else if (this.mode === CAMERA_MODE_THIRD_PERSON_FAR) {
           translation.makeTranslation(0, 2, 8);
+        }
+        if (this.mode !== CAMERA_MODE_THIRD_PERSON_SKY) {
           this.avatarRig.object3D.updateMatrices();
 
           // translation of viewingRig from avatarRig
@@ -494,13 +510,13 @@ export class CameraSystem {
 
           setMatrixWorld(this.viewingRig.object3D, this.viewingRig.object3D.matrixWorld);
           this.avatarPOV.object3D.quaternion.copy(this.viewingCamera.object3DMap.camera.quaternion);
-        } else if (this.mode === CAMERA_MODE_THIRD_PERSON_SKY) {
+        } else {
           const quaternion = new THREE.Quaternion();
           this.viewingCamera.object3D.quaternion.copy(
             quaternion.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI / 3)
           );
 
-          // translation.makeTranslation(0, 0, 3);
+          translation.makeTranslation(0, -4 + this.cameraZoom, 0);
           this.avatarRig.object3D.updateMatrices();
 
           // translation of viewingRig from avatarRig
@@ -508,14 +524,6 @@ export class CameraSystem {
 
           setMatrixWorld(this.viewingRig.object3D, this.viewingRig.object3D.matrixWorld);
         }
-
-        // this.avatarRig.object3D.updateMatrices();
-
-        // // translation of viewingRig from avatarRig
-        // this.viewingRig.object3D.matrixWorld.copy(this.avatarRig.object3D.matrixWorld).multiply(translation);
-
-        // setMatrixWorld(this.viewingRig.object3D, this.viewingRig.object3D.matrixWorld);
-
         this.avatarPOV.object3D.matrixNeedsUpdate = true;
       } else if (this.mode === CAMERA_MODE_INSPECT) {
         this.avatarPOVRotator.on = false;

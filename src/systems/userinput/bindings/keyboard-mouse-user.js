@@ -203,6 +203,20 @@ export const keyboardMouseUserBindings = addSetsToBindings({
     },
     {
       src: {
+        value: paths.device.keyboard.key("+")
+      },
+      dest: { value: paths.actions.cameraZoomIn },
+      xform: xforms.copy
+    },
+    {
+      src: {
+        value: paths.device.keyboard.key("-")
+      },
+      dest: { value: paths.actions.cameraZoomOut },
+      xform: xforms.copy
+    },
+    {
+      src: {
         value: paths.device.keyboard.key("m")
       },
       dest: {
